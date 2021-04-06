@@ -1,0 +1,125 @@
+package com.isolate.tanhua.mytanhuasso.utils;
+
+import io.jsonwebtoken.*;
+import org.apache.tomcat.util.codec.binary.Base64;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by Ping on 2020/5/2.
+ */
+public class JwtUtils {
+    /**
+     * 私钥
+     */
+    private static final String JWT_SECRET = "MDk4ZjZiY2Q0NjIxZDM3M2NhZGU0ZTgzMjYyN2I0ZjY=";
+
+    /**
+     *生成 token
+     * @param claims 自定义Payload键值对
+     * @param TTLMillis 过期时间
+     * @return
+     */
+    public static String createToken(String audience, String subject, Map<String, Object> claims, Long TTLMillis) {
+        //  生成签名密钥
+        Key signingKey = generateKey();
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+
+        //  生成JWT的时间
+        Long nowMillis = System.currentTimeMillis();
+
+        JwtBuilder builder = Jwts.builder()
+                // 设置header
+                .setHeaderParam("typ", "JWT")
+                .setHeaderParam("alg", "HS256")
+                // 生成签名的时间
+                .setIssuedAt(new Date(nowMillis))
+                // 设置payload的键值对
+                .setClaims(claims)
+                // JWT签发者
+                .setIssuer("P_Jin")
+                // 代表这个JWT的主体，即它的所有人
+                .setSubject(subject)
+                // 代表这个JWT的接收对象
+                .setAudience(audience)
+                // 签名需要的算法和key
+                .signWith(signatureAlgorithm, signingKey);
+
+        //  添加Token过期时间
+        if (TTLMillis != null && TTLMillis >= 0) {
+            Long expMillis = nowMillis + TTLMillis * 1000;
+            Date exp = new Date(expMillis);
+            //  设置过期时间
+            builder.setExpiration(exp);
+        }
+        return builder.compact();
+    }
+
+    /**
+     * 生成 token ，没有payload
+     * @param audience
+     * @param subject
+     * @param TTLMillis
+     * @return
+     */
+    public static String createToken(String audience, String subject, Long TTLMillis) {
+        return createToken(audience, subject, null, TTLMillis);
+    }
+
+    /**
+     * 生成 token ，没有过期时间
+     *
+     * @param claims 自定义payload的键值对
+     * @return
+     */
+    public static String createToken(String audience, String subject, Map<String, Object> claims) {
+        return createToken(audience, subject, claims, null);
+    }
+
+    /**
+     * 解密 jwt
+     * @param jwt 请求头中authorization的token
+     * @return
+     */
+    public static Claims decodeJwt(String jwt) {
+        if (jwt == null) {
+            return null;
+        }
+        try {
+            return Jwts.parser()
+                    //  此处的key要与之前创建的key一致
+                    .setSigningKey(generateKey())
+                    .parseClaimsJws(jwt)
+                    .getBody();
+
+        }catch (ExpiredJwtException e){
+            return null;
+        }
+    }
+
+    /**
+     * 由字符串生成加密key
+     *
+     * @return
+     */
+    private static SecretKey generateKey() {
+        //  生成签名密钥
+        byte[] encodedKey = Base64.decodeBase64(JWT_SECRET);
+        return new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
+    }
+
+    public static void main(String[] args) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("user_id", 1L);
+        String token = JwtUtils.createToken("admin", "pingjing", claims, 86400L);
+        System.out.println(token);
+        Map<String, Object> claim = JwtUtils.decodeJwt(token);
+        System.out.println(claim);
+        System.out.println(claim.get("user_id"));
+    }
+}
