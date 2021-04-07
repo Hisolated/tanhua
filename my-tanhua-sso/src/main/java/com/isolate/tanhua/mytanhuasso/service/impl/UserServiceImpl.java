@@ -10,6 +10,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +36,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    private RedisTemplate rocketMQTemplate;
+    private RocketMQTemplate rocketMQTemplate;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -47,6 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String verificationCode = "123456";
         //2.保存phone到Redis中
         String redisKey = "CHECK_CODE_" + phone;
+        System.out.println("redisKey:" + redisKey);
         redisTemplate.opsForValue().set(redisKey, verificationCode);
     }
 
@@ -92,7 +94,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         try {
             //发送用户登录成功的消息
-            Map<String, Object> msg = new HashMap<>();
+            Map<String,Object> msg = new HashMap<>();
             msg.put("id", user.getId());
             msg.put("date", System.currentTimeMillis());
 
