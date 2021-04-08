@@ -31,15 +31,6 @@ public class SmsUtils {
     private static final String SIGN_NAME = "ABC商城";
     private static final String TEMPLATE_CODE = "SMS_204756062";
 
-    /**
-     * todo:此处信息暂时不知道有没有用,配置文件写的,先留着
-     */
-//    private static String endpoint = "http://oss-cn-hangzhou.aliyuncs.com";
-//    private static String accessKeyId2 = "LTAI4G3iwLAPWLAxD3hJ9Tv8";
-//    private static String accessKeySecret2 = "bX8gvHGQJsPGtfXXY7DGI3zC61TFz1 ";
-//    private static String bucketName= "hztanhua";
-//    private static String urlPrefix="https://hztanhua.oss-cn-hangzhou.aliyuncs.com/";
-
     /**使用阿里短信服务发送短信验证码(主代码来源阿里官网)
      *
      * @param mobile 手机号
