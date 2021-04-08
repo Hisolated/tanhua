@@ -70,9 +70,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.eq("mobile", phone);
 
         User user = this.userMapper.selectOne(queryWrapper);
-        if (user == null) {
+        if (null == user) {
             //mysql中不存在该用户,将该用户保存到数据库中,暂时不保存密码
-            //需要注册该用户
+            //需要注册该用户,同时设置默认密码
             user = new User();
             user.setMobile(phone);
             user.setPassword(DigestUtils.md5Hex("123456"));
@@ -128,7 +128,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             //2. 解析token中的id,同时通过id查询数据
             User user = userMapper.selectById(claims.get("id").toString());
             System.out.println(user);
-            return user;
+            if(null != user){
+                return user;
+            }
         } catch (ExpiredJwtException e) {
             //todo:此处先用这种方法展示,后期要使用自定义异常携带信息抛出
             System.out.println("token已经过期");
@@ -139,18 +141,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return null;
     }
 
-    public static void main(String[] args) {
-
-        String token ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtb2JpbGUiOiIxNzYwMjAyNjg2OCIsImlkIjoxLCJleHAiOjE2MTc4MjI3NDh9.rEfwcMWi89M69w2r2ICzPC3HNYl31LYYa0xMJHwy9Ik";
-        String  secret = "76bd425b6f29f7fcc2e0bfc286043df1";
-        Map<String,Object> claims = Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
-
-        Object id = claims.get("id");
-        System.out.println("id = " + id);
-        System.out.println(claims);
-
-    }
+//    public static void main(String[] args) {
+//
+//        String token ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtb2JpbGUiOiIxNzYwMjAyNjg2OCIsImlkIjoxLCJleHAiOjE2MTc4MjI3NDh9.rEfwcMWi89M69w2r2ICzPC3HNYl31LYYa0xMJHwy9Ik";
+//        String  secret = "76bd425b6f29f7fcc2e0bfc286043df1";
+//        Map<String,Object> claims = Jwts.parser()
+//                .setSigningKey(secret)
+//                .parseClaimsJws(token)
+//                .getBody();
+//
+//        Object id = claims.get("id");
+//        System.out.println("id = " + id);
+//        System.out.println(claims);
+//
+//    }
 }
