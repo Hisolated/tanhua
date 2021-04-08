@@ -37,7 +37,7 @@ public class UserController {
         System.out.println("login()");
         String phone = param.get("phone");
         userService.login(phone);
-        return ResponseEntity.ok(200);
+        return ResponseEntity.ok(null);
     }
 
     @PostMapping("/loginVerification")
