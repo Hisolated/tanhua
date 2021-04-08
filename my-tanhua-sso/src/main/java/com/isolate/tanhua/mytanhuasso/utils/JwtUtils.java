@@ -22,7 +22,7 @@ public class JwtUtils {
     /**
      *生成 token
      * @param claims 自定义Payload键值对
-     * @param TTLMillis 过期时间
+     * @param TTLMillis 过期时间,单位秒(s)
      * @return
      */
     public static String createToken(String audience, String subject, Map<String, Object> claims, Long TTLMillis) {
@@ -63,7 +63,7 @@ public class JwtUtils {
     /**
      * 生成 token ，没有audience(接收者),subject(面向用户)
      * @param claims payload(用户信息参数)
-     * @param TTLMillis 过期时间
+     * @param TTLMillis 过期时间,单位秒(s)
      * @return
      */
     public static String createToken(Map<String, Object> claims, Long TTLMillis) {
@@ -85,7 +85,7 @@ public class JwtUtils {
      * 生成 token ，没有payload
      * @param audience
      * @param subject
-     * @param TTLMillis
+     * @param TTLMillis 过期时间,单位秒
      * @return
      */
     public static String createToken(String audience, String subject, Long TTLMillis) {
@@ -127,7 +127,7 @@ public class JwtUtils {
     public static void main(String[] args) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("user_id", 1L);
-        String token = JwtUtils.createToken("admin", "pingjing", claims, 86400L);
+        String token = JwtUtils.createToken("admin", "isolate", claims, 86400L);
         System.out.println(token);
         Map<String, Object> claim = JwtUtils.decodeToken(token);
         System.out.println(claim);
