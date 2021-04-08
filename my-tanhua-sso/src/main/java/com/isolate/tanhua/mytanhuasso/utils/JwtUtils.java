@@ -17,7 +17,7 @@ public class JwtUtils {
     /**
      * 私钥
      */
-    private static final String JWT_SECRET = "MDk4ZjZiY2Q0NjIxZDM3M2NhZGU0ZTgzMjYyN2I0ZjY=";
+    private static final String JWT_SECRET = "76bd425b6f29f7fcc2e0bfc286043df1";
 
     /**
      *生成 token
@@ -42,7 +42,7 @@ public class JwtUtils {
                 // 设置payload的键值对
                 .setClaims(claims)
                 // JWT签发者
-                .setIssuer("P_Jin")
+                .setIssuer("isolate")
                 // 代表这个JWT的主体，即它的所有人
                 .setSubject(subject)
                 // 代表这个JWT的接收对象

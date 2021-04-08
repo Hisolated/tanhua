@@ -13,7 +13,6 @@ import java.util.Date;
  */
 public class BasePojo {
 
-
     @TableField(fill = FieldFill.INSERT)
     public Date created;
 

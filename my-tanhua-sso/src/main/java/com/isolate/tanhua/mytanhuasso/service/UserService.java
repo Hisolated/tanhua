@@ -2,6 +2,7 @@ package com.isolate.tanhua.mytanhuasso.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.isolate.tanhua.mytanhuasso.pojo.User;
+import com.isolate.tanhua.mytanhuasso.pojo.UserInfo;
 
 /**
 *
@@ -15,4 +16,6 @@ public interface UserService extends IService<User> {
     public void login(String phone);
 
     String loginVerification(String phone, String code);
+
+    User findByToken(String token);
 }
