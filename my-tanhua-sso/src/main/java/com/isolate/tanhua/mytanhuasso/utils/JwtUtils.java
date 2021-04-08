@@ -61,14 +61,13 @@ public class JwtUtils {
     }
 
     /**
-     * 生成 token ，没有payload
-     * @param audience
-     * @param subject
-     * @param TTLMillis
+     * 生成 token ，没有audience(接收者),subject(面向用户)
+     * @param claims payload(用户信息参数)
+     * @param TTLMillis 过期时间
      * @return
      */
-    public static String createToken(String audience, String subject, Long TTLMillis) {
-        return createToken(audience, subject, null, TTLMillis);
+    public static String createToken(Map<String, Object> claims, Long TTLMillis) {
+        return createToken(null, null, claims, TTLMillis);
     }
 
     /**
@@ -81,20 +80,32 @@ public class JwtUtils {
         return createToken(audience, subject, claims, null);
     }
 
+
     /**
-     * 解密 jwt
-     * @param jwt 请求头中authorization的token
+     * 生成 token ，没有payload
+     * @param audience
+     * @param subject
+     * @param TTLMillis
      * @return
      */
-    public static Claims decodeJwt(String jwt) {
-        if (jwt == null) {
+    public static String createToken(String audience, String subject, Long TTLMillis) {
+        return createToken(audience, subject, null, TTLMillis);
+    }
+
+    /**
+     * 解密 jwt
+     * @param token 请求头中authorization的token
+     * @return 返回生成token是的payload
+     */
+    public static Claims decodeToken(String token) {
+        if (token == null) {
             return null;
         }
         try {
             return Jwts.parser()
                     //  此处的key要与之前创建的key一致
                     .setSigningKey(generateKey())
-                    .parseClaimsJws(jwt)
+                    .parseClaimsJws(token)
                     .getBody();
 
         }catch (ExpiredJwtException e){
@@ -118,7 +129,7 @@ public class JwtUtils {
         claims.put("user_id", 1L);
         String token = JwtUtils.createToken("admin", "pingjing", claims, 86400L);
         System.out.println(token);
-        Map<String, Object> claim = JwtUtils.decodeJwt(token);
+        Map<String, Object> claim = JwtUtils.decodeToken(token);
         System.out.println(claim);
         System.out.println(claim.get("user_id"));
     }

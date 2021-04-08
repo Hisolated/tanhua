@@ -34,7 +34,6 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper,UserInfo> im
         userInfo.setNickName(param.get("nickname"));
         userInfo.setBirthday(param.get("birthday"));
         userInfo.setCity(param.get("city"));
-//        userInfo.set(param.get("nickname"));
 
         int result = userInfoMapper.insert(userInfo);
 
