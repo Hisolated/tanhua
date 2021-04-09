@@ -2,14 +2,13 @@ package com.isolate.tanhua.mytanhuasso.utils;
 
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.PutObjectResult;
-import com.isolate.tanhua.mytanhuasso.vo.PicUploadResult;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  * @description: 文件处理
@@ -26,49 +25,30 @@ public class FileUtils {
     private static final String ACCESS_KEY_ID = "LTAI5t5tZnoi49wem81TYkWz";
     private static final String ACCESS_KEY_SECRET = "xQOVUXbjnWoxAFxRfIuFpMya2TDMxb";
     private static final String BUCKET_NAME = "isolate-h";
-    private static final String URL_PREFIX ="https://isolate-h.oss-cn-hangzhou.aliyuncs.com/";
+    private static final String URL_PREFIX = "https://isolate-h.oss-cn-hangzhou.aliyuncs.com/";
+
+    private static OSSClient ossClient;
+
+    static {
+        ossClient = new OSSClient(ENDPOINT, ACCESS_KEY_ID, ACCESS_KEY_SECRET);
+    }
 
 
-
-    // 允许上传图片文件的格式
-    private static final String[] IMAGE_TYPE = new String[]{
-            ".bmp", ".jpg",".jpeg", ".gif", ".png"
-    };
-
-    private static final OSSClient ossClient =new OSSClient(ENDPOINT,ACCESS_KEY_ID,ACCESS_KEY_SECRET);
-
-
-    public static String upload(MultipartFile uploadFile) {
-
-        //图片做校验，对后缀名
-        boolean isLegal = false;
-
-        // 校验文件后缀,不符合IMAGE_TYPE后缀的直接不上传
-        for (String type : IMAGE_TYPE) {
-            if (StringUtils.endsWithIgnoreCase(uploadFile.getOriginalFilename(),
-                    type)) {
-                isLegal = true;
-                break;
-            }
-        }
-        if (!isLegal) {
-            //todo:抛出自定义异常
-            System.out.println("文件格式不匹配!");
-            return null;
-        }
+    /**
+     *
+     * @param uploadFile
+     * @return 返回上传后的文件路径
+     * @throws IOException
+     */
+    public static String upload(MultipartFile uploadFile) throws IOException {
 
         // 文件新路径
         String fileName = uploadFile.getOriginalFilename();
         String filePath = getFilePath(fileName);
+        byte[] fileBytes = uploadFile.getBytes();
 
-        try {
-            // 目录结构：images/2018/12/29/xxxx.jpg
-            ossClient.putObject(BUCKET_NAME, filePath, new ByteArrayInputStream(uploadFile.getBytes()));
-        } catch (Exception e) {
-            //todo:抛出自定义异常
-            System.out.println("文件上传失败!");
-            return null;
-        }
+        // 目录结构：images/2018/12/29/xxxx.jpg,上传阿里云存储服务器
+        ossClient.putObject(BUCKET_NAME, filePath, new ByteArrayInputStream(fileBytes));
 
         return URL_PREFIX + filePath;
     }
@@ -81,5 +61,9 @@ public class FileUtils {
                 + dateTime.toString("dd") + "/" + System.currentTimeMillis() +
                 RandomUtils.nextInt(100, 9999) + "." +
                 StringUtils.substringAfterLast(sourceFileName, ".");
+    }
+
+    public static void main(String[] args) {
+
     }
 }
