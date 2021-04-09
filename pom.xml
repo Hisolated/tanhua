@@ -147,6 +147,7 @@
                 <artifactId>dubbo</artifactId>
                 <version>2.6.4</version>
             </dependency>
+            <!--阿里云oss云存储服务SDK-->
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
@@ -177,6 +178,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-devtools</artifactId>
                 <version>2.1.18.RELEASE</version>
+            </dependency>
+
+            <!--虹软人脸识别SDK-->
+            <dependency>
+                <groupId>com.arcsoft.face</groupId>
+                <artifactId>arcsoft-sdk-face</artifactId>
+                <version>3.0.0.0</version>
             </dependency>
         </dependencies>
 
