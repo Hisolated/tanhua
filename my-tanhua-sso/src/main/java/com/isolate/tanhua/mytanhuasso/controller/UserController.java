@@ -9,8 +9,10 @@ import com.isolate.tanhua.mytanhuasso.service.UserInfoService;
 import com.isolate.tanhua.mytanhuasso.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,27 +49,45 @@ public class UserController {
         String code = param.get("verificationCode");
         String data = userService.loginVerification(phone, code);
         System.out.println(data);
-
-        Map<String, Object> result = new HashMap<>();
+        if(StringUtils.isBlank(data)){
+            //todo:登录失败,抛出自定义异常
+        }
+        Map<String, Object> result = new HashMap<>(2);
         String[] ss = StringUtils.split(data, '|');
-
         result.put("token", ss[0]);
         result.put("isNew", Boolean.valueOf(ss[1]));
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/loginReginfo")
-    private ResponseEntity<Object>  loginReginfo(@RequestHeader("Authorization") String token, @RequestBody Map<String,String> param){
-//        String token =param.get("Authorization");
+    public ResponseEntity<Object>  loginReginfo(@RequestHeader("Authorization") String token, @RequestBody Map<String,String> param){
+
         System.out.println("token: " + token);
         //1. 解析token,查询用户
         User user = userService.findByToken(token);
         System.out.println("user: " + user);
         //2. 通过token返回的用户,更新userinfo的信息
-//        userInfo.setUserId(user.getId());
-//        System.out.println("userInfo: " + userInfo);
+
         boolean result = userInfoService.saveUserInfo(param,user);
-        System.out.println("result: "+result);
-        return ResponseEntity.ok(200);
+        if(!result){
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+        return ResponseEntity.ok(null);
+    }
+
+    //设置头像
+    @PostMapping("/loginReginfo/head")
+    public ResponseEntity<Object> saveUserLogo(@RequestParam("headPhoto") MultipartFile file,
+                                               @RequestHeader("Authorization") String token) {
+        try {
+            Boolean bool = this.userInfoService.saveUserLogo(file, token);
+            if (bool) {
+                return ResponseEntity.ok(null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 }

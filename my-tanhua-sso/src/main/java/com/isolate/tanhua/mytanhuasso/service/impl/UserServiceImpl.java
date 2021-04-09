@@ -6,6 +6,7 @@ import com.isolate.tanhua.mytanhuasso.pojo.User;
 import com.isolate.tanhua.mytanhuasso.pojo.UserInfo;
 import com.isolate.tanhua.mytanhuasso.service.UserService;
 import com.isolate.tanhua.mytanhuasso.mapper.UserMapper;
+import com.isolate.tanhua.mytanhuasso.utils.JwtUtils;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -38,6 +39,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
 
+    @Deprecated
     @Value("${jwt.secret}")
     private String secret;
 
@@ -47,23 +49,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //1.发送验证码到对应的手机,由于短信暂时用不了,所以需要固定验证码
         String verificationCode = "123456";
         //2.保存phone到Redis中
-        String redisKey = "CHECK_CODE_" + phone;
-        System.out.println("redisKey:" + redisKey);
-        redisTemplate.opsForValue().set(redisKey, verificationCode);
+        String redisKey = "user:login:" + phone;
+        this.redisTemplate.opsForValue().set(redisKey, verificationCode);
     }
 
     @Override
     public String loginVerification(String phone, String code) {
-        String redisKey = "CHECK_CODE_" + phone;
+        // redis中key的命名(项目:业务名:手机号)
+        String redisKey = "user:login:" + phone;
         boolean isNew = false;
 
-        String redisCode = redisTemplate.opsForValue().get(redisKey);
+        String redisCode = this.redisTemplate.opsForValue().get(redisKey);
         System.out.println("redisCode:" +redisCode);
 
         if (!StringUtils.equals(code, redisCode)) {
             return null; //验证码错误
         }
         //验证码正确
+        //验证完成后,redis中数据需要删除
+        this.redisTemplate.delete(redisKey);
 
         //从数据库中查询,看是否存在该用户
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -76,7 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             user = new User();
             user.setMobile(phone);
             user.setPassword(DigestUtils.md5Hex("123456"));
-            userMapper.insert(user);
+            this.userMapper.insert(user);
 
             isNew = true;
         }
@@ -84,22 +88,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         //生成token
 
-        //设置jwt的头
-        Map<String, Object> header = new HashMap<String, Object>();
-        header.put(JwsHeader.TYPE,JwsHeader.JWT_TYPE);
-        header.put(JwsHeader.ALGORITHM,"HS256");
-
         //设置payload
         Map<String, Object> claims = new HashMap<String, Object>();
         claims.put("id", user.getId());
         claims.put("mobile",user.getMobile());
 
-        String token = Jwts.builder()
-                .setHeader(header)
-                .setClaims(claims) //payload，存放数据的位置，不能放置敏感数据，如：密码等
-                .signWith(SignatureAlgorithm.HS256, secret) //设置加密方法和加密盐
-                .setExpiration(new DateTime().plusHours(12).toDate()) //设置过期时间，12小时后过期
-                .compact();
+        // 过期时间设置为12小时
+        String token = JwtUtils.createToken(claims, 12 * 60 * 60L);
 
         try {
             //发送用户登录成功的消息
@@ -120,13 +115,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         try {
             //1. 解析token
-            Map<String,Object> claims = Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token)
-                    .getBody();
+            Claims claims = JwtUtils.decodeToken(token);
             System.out.println("claims = " + claims);
             //2. 解析token中的id,同时通过id查询数据
-            User user = userMapper.selectById(claims.get("id").toString());
+            User user = this.userMapper.selectById(claims.get("id").toString());
             System.out.println(user);
             if(null != user){
                 return user;
@@ -141,18 +133,4 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return null;
     }
 
-//    public static void main(String[] args) {
-//
-//        String token ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtb2JpbGUiOiIxNzYwMjAyNjg2OCIsImlkIjoxLCJleHAiOjE2MTc4MjI3NDh9.rEfwcMWi89M69w2r2ICzPC3HNYl31LYYa0xMJHwy9Ik";
-//        String  secret = "76bd425b6f29f7fcc2e0bfc286043df1";
-//        Map<String,Object> claims = Jwts.parser()
-//                .setSigningKey(secret)
-//                .parseClaimsJws(token)
-//                .getBody();
-//
-//        Object id = claims.get("id");
-//        System.out.println("id = " + id);
-//        System.out.println(claims);
-//
-//    }
 }
