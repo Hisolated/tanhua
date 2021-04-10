@@ -11,6 +11,7 @@ import com.tanhua.sso.service.UserService;
 import com.tanhua.sso.utils.FaceEngineUtils;
 import com.tanhua.sso.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,7 +39,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     @Override
     public Boolean saveUserInfo(Map<String, String> param, User user) {
         UserInfo userInfo = new UserInfo();
-        userInfo.setSex(SexEnum.valueOf(param.get("gender")));
+        userInfo.setSex(StringUtils.equalsIgnoreCase(param.get("gender"), "man") ? SexEnum.MAN : SexEnum.WOMAN);
         userInfo.setUserId(user.getId());
         userInfo.setNickName(param.get("nickname"));
         userInfo.setBirthday(param.get("birthday"));
@@ -72,7 +73,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         //3. 对file进行处理,上传阿里云oss服务器,同时返回访问路径
         try {
             String filePath = FileUtils.upload(file);
-            if(null != filePath){
+            if (null != filePath) {
                 //4. 图片上传成功,将图片路径更新到mysql数据库中userinfo表中
                 UpdateWrapper<UserInfo> wrapper = new UpdateWrapper<>();
                 wrapper.set("logo", filePath)
