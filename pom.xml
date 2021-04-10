@@ -15,7 +15,7 @@
         <module>my-tanhua-sso</module>
     </modules>
 
-    <groupId>cn.isolate.tanhua</groupId>
+    <groupId>com.tanhua</groupId>
     <artifactId>my-tanhua</artifactId>
     <version>1.0-SNAPSHOT</version>
 
