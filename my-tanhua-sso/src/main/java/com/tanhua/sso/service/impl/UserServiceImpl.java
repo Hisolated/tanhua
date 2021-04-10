@@ -2,9 +2,9 @@ package com.tanhua.sso.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.tanhua.sso.pojo.User;
+import com.tanhua.common.mapper.UserMapper;
+import com.tanhua.common.pojo.User;
 import com.tanhua.sso.service.UserService;
-import com.tanhua.sso.mapper.UserMapper;
 import com.tanhua.sso.utils.JwtUtils;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +37,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
 
-    @Deprecated
-    @Value("${jwt.secret}")
-    private String secret;
 
     @Override
     public void login(String phone) {

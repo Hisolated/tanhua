@@ -13,6 +13,7 @@
 
     <modules>
         <module>my-tanhua-sso</module>
+        <module>my-tanhua-common</module>
     </modules>
 
     <groupId>com.tanhua</groupId>

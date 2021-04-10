@@ -1,4 +1,4 @@
-package com.tanhua.sso.pojo;
+package com.tanhua.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;

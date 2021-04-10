@@ -1,7 +1,7 @@
 package com.tanhua.sso.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.tanhua.sso.pojo.User;
+import com.tanhua.common.pojo.User;
 
 /**
 *

@@ -1,6 +1,6 @@
 package com.tanhua.sso.service;
 
-import com.tanhua.sso.pojo.User;
+import com.tanhua.common.pojo.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
