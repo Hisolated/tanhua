@@ -3,6 +3,8 @@ package com.tanhua.sso.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.tanhua.common.pojo.User;
 
+import java.util.Map;
+
 /**
 *
 */
@@ -14,7 +16,7 @@ public interface UserService extends IService<User> {
      */
     public void login(String phone);
 
-    String loginVerification(String phone, String code);
+    Map<String,Object> loginVerification(String phone, String code);
 
     User findByToken(String token);
 }

@@ -2,6 +2,8 @@ package com.tanhua.sso.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.tanhua.common.enums.ResultEnum;
+import com.tanhua.common.exception.BusinessException;
 import com.tanhua.common.mapper.UserMapper;
 import com.tanhua.common.pojo.User;
 import com.tanhua.sso.service.UserService;
@@ -49,7 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public String loginVerification(String phone, String code) {
+    public Map<String, Object> loginVerification(String phone, String code) {
         // redis中key的命名(项目:业务名:手机号)
         String redisKey = "user:login:" + phone;
         boolean isNew = false;
@@ -58,7 +60,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         System.out.println("redisCode:" +redisCode);
 
         if (!StringUtils.equals(code, redisCode)) {
-            return null; //验证码错误
+            /**
+             * 验证码错误
+             */
+            new BusinessException(ResultEnum.VERIFY_CODE_FAIL.getCode(),ResultEnum.VERIFY_CODE_FAIL.getMessage());
+            return null;
         }
         //验证码正确
         //验证完成后,redis中数据需要删除
@@ -79,8 +85,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
             isNew = true;
         }
-
-
         //生成token
 
         //设置payload
@@ -100,9 +104,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             this.rocketMQTemplate.convertAndSend("tanhua-sso-login", msg);
         } catch (MessagingException e) {
             log.error("发送消息失败！", e);
+            new BusinessException(ResultEnum.ROCKETMQ_SENDMSG_FAIL.getCode(),ResultEnum.ROCKETMQ_SENDMSG_FAIL.getMessage());
         }
 
-        return token + "|" + isNew;
+        Map<String, Object> result = new HashMap<>(2);
+        result.put("token", token);
+        result.put("isNew", isNew);
+
+        return result;
     }
 
     @Override
@@ -119,11 +128,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                 return user;
             }
         } catch (ExpiredJwtException e) {
-            //todo:此处先用这种方法展示,后期要使用自定义异常携带信息抛出
             System.out.println("token已经过期");
+            new BusinessException(ResultEnum.TOKEN_EXPIRED.getCode(),ResultEnum.TOKEN_EXPIRED.getMessage());
         } catch (Exception e) {
-            log.error("token不合法 = " + token,e);
             System.out.println("token不合法!");
+            new BusinessException(ResultEnum.TOKEN_ILLEGAL.getCode(),ResultEnum.TOKEN_ILLEGAL.getMessage());
+
         }
         return null;
     }

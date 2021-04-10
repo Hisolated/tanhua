@@ -1,6 +1,9 @@
 package com.tanhua.sso.controller;
 
 
+import com.tanhua.common.enums.ResultEnum;
+import com.tanhua.common.exception.BusinessException;
+import com.tanhua.common.exception.SystemException;
 import com.tanhua.common.pojo.User;
 import com.tanhua.sso.service.UserInfoService;
 import com.tanhua.sso.service.UserService;
@@ -43,15 +46,13 @@ public class UserController {
     public ResponseEntity<Object> loginVerification(@RequestBody Map<String,String> param){
         String phone = param.get("phone");
         String code = param.get("verificationCode");
-        String data = userService.loginVerification(phone, code);
-        System.out.println(data);
-        if(StringUtils.isBlank(data)){
-            //todo:登录失败,抛出自定义异常
+        Map<String,Object> result = userService.loginVerification(phone, code);
+        System.out.println(result);
+        if(result.size() == 0){
+            new BusinessException(ResultEnum.CREATE_TOKEN_FAIL.getCode(),ResultEnum.CREATE_TOKEN_FAIL.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        Map<String, Object> result = new HashMap<>(2);
-        String[] ss = StringUtils.split(data, '|');
-        result.put("token", ss[0]);
-        result.put("isNew", Boolean.valueOf(ss[1]));
+
         return ResponseEntity.ok(result);
     }
 
