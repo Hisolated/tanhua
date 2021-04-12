@@ -5,6 +5,7 @@ import com.tanhua.common.enums.ResultEnum;
 import com.tanhua.common.exception.BusinessException;
 import com.tanhua.common.exception.SystemException;
 import com.tanhua.common.pojo.User;
+import com.tanhua.common.utils.UserThreadLocal;
 import com.tanhua.sso.service.UserInfoService;
 import com.tanhua.sso.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -56,11 +57,10 @@ public class UserController {
     }
 
     @PostMapping("/loginReginfo")
-    public ResponseEntity<Object>  loginReginfo(@RequestHeader("Authorization") String token, @RequestBody Map<String,String> param){
+    public ResponseEntity<Object>  loginReginfo(@RequestBody Map<String,String> param){
 
-        System.out.println("token: " + token);
         //1. 解析token,查询用户
-        User user = userService.findByToken(token);
+        User user = UserThreadLocal.get();
         System.out.println("user: " + user);
         //2. 通过token返回的用户,更新userinfo的信息
 
@@ -85,5 +85,17 @@ public class UserController {
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+
+
+    /**
+     * 校验token，根据token查询用户数据
+     *
+     * @param token
+     * @return
+     */
+    @GetMapping("{token}")
+    public User queryUserByToken(@PathVariable("token") String token) {
+        return this.userService.findByToken(token);
     }
 }
