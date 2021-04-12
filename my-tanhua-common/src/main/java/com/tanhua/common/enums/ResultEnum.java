@@ -17,6 +17,8 @@ public enum  ResultEnum {
     ROCKETMQ_SENDMSG_FAIL(10003,"rocketMQ发送消息失败"),
     VERIFY_CODE_FAIL(10004,"验证码错误"),
     CREATE_TOKEN_FAIL(10005,"token生成失败"),
+    ACTIVE_FACE_ENGINE_FAIL(10006,"人脸识别引擎激活失败"),
+    INIT_FACE_ENGINE_FAIL(10007,"人脸识别引擎初始化失败"),
     NOT_NETWORK(1, "系统繁忙，请稍后再试。"),
     LOGIN_VERIFY_FALL(2, "登录失效"),
     PARAM_VERIFY_FALL(3, "参数验证错误"),

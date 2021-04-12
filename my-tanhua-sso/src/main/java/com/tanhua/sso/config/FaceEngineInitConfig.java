@@ -1,6 +1,8 @@
 package com.tanhua.sso.config;
 
 import com.arcsoft.face.enums.ErrorInfo;
+import com.tanhua.common.enums.ResultEnum;
+import com.tanhua.common.exception.BusinessException;
 import com.tanhua.sso.utils.FaceEngineUtils;
 import org.springframework.stereotype.Component;
 
@@ -20,16 +22,14 @@ public class FaceEngineInitConfig {
         // 激活引擎
         Integer activeCode = FaceEngineUtils.activeEngine();
         if (activeCode != ErrorInfo.MOK.getValue() && activeCode != ErrorInfo.MERR_ASF_ALREADY_ACTIVATED.getValue()) {
-            //todo:抛出自定义异常;
-            throw new RuntimeException("引擎激活失败");
+            throw new BusinessException(ResultEnum.ACTIVE_FACE_ENGINE_FAIL.getCode(),ResultEnum.ACTIVE_FACE_ENGINE_FAIL.getMessage());
         }
 
         //初始化引擎
         int initCode = FaceEngineUtils.initEngine();
 
         if (initCode != ErrorInfo.MOK.getValue()) {
-            //todo:抛出自定义异常
-            throw new RuntimeException("初始化引擎出错!");
+            throw new BusinessException(ResultEnum.INIT_FACE_ENGINE_FAIL.getCode(),ResultEnum.INIT_FACE_ENGINE_FAIL.getMessage());
         }
     }
 }

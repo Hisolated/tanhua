@@ -66,7 +66,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
                 return false;
             }
         } catch (IOException e) {
-            //todo:抛出自定义异常(虹软人脸识别失败)
+            //todo:抛出自定义异常(虹软人脸识别失败),其实是getBytes报的异常
             e.printStackTrace();
         }
 
