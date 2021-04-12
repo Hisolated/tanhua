@@ -15,7 +15,7 @@ import java.io.IOException;
  * @email: 15071340963@163.com
  * @date: 2021/4/8 12:55
  */
-public class FileUtils {
+public class FileUploadUtils {
 
     /**
      * 阿里云存储服务(OSS)参数信息
