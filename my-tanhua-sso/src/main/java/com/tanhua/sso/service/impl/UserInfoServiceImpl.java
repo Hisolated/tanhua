@@ -9,7 +9,7 @@ import com.tanhua.common.pojo.UserInfo;
 import com.tanhua.sso.service.UserInfoService;
 import com.tanhua.sso.service.UserService;
 import com.tanhua.sso.utils.FaceEngineUtils;
-import com.tanhua.sso.utils.FileUtils;
+import com.tanhua.sso.utils.FileUploadUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
         //3. 对file进行处理,上传阿里云oss服务器,同时返回访问路径
         try {
-            String filePath = FileUtils.upload(file);
+            String filePath = FileUploadUtils.upload(file);
             if (null != filePath) {
                 //4. 图片上传成功,将图片路径更新到mysql数据库中userinfo表中
                 UpdateWrapper<UserInfo> wrapper = new UpdateWrapper<>();

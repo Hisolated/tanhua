@@ -63,8 +63,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             /**
              * 验证码错误
              */
-            new BusinessException(ResultEnum.VERIFY_CODE_FAIL.getCode(),ResultEnum.VERIFY_CODE_FAIL.getMessage());
-            return null;
+            throw new BusinessException(ResultEnum.VERIFY_CODE_FAIL.getCode(),ResultEnum.VERIFY_CODE_FAIL.getMessage());
         }
         //验证码正确
         //验证完成后,redis中数据需要删除
@@ -104,7 +103,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             this.rocketMQTemplate.convertAndSend("tanhua-sso-login", msg);
         } catch (MessagingException e) {
             log.error("发送消息失败！", e);
-            new BusinessException(ResultEnum.ROCKETMQ_SENDMSG_FAIL.getCode(),ResultEnum.ROCKETMQ_SENDMSG_FAIL.getMessage());
+            throw new BusinessException(ResultEnum.ROCKETMQ_SENDMSG_FAIL.getCode(),ResultEnum.ROCKETMQ_SENDMSG_FAIL.getMessage());
         }
 
         Map<String, Object> result = new HashMap<>(2);
@@ -129,11 +128,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             }
         } catch (ExpiredJwtException e) {
             System.out.println("token已经过期");
-            new BusinessException(ResultEnum.TOKEN_EXPIRED.getCode(),ResultEnum.TOKEN_EXPIRED.getMessage());
+            throw new BusinessException(ResultEnum.TOKEN_EXPIRED.getCode(),ResultEnum.TOKEN_EXPIRED.getMessage());
         } catch (Exception e) {
             System.out.println("token不合法!");
-            new BusinessException(ResultEnum.TOKEN_ILLEGAL.getCode(),ResultEnum.TOKEN_ILLEGAL.getMessage());
-
+            throw new BusinessException(ResultEnum.TOKEN_ILLEGAL.getCode(),ResultEnum.TOKEN_ILLEGAL.getMessage());
         }
         return null;
     }
