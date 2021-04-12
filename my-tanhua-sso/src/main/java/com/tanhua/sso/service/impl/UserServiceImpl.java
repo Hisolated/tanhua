@@ -57,13 +57,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         boolean isNew = false;
 
         String redisCode = this.redisTemplate.opsForValue().get(redisKey);
-        System.out.println("redisCode:" +redisCode);
+        System.out.println("redisCode:" + redisCode);
 
         if (!StringUtils.equals(code, redisCode)) {
             /**
              * 验证码错误
              */
-            throw new BusinessException(ResultEnum.VERIFY_CODE_FAIL.getCode(),ResultEnum.VERIFY_CODE_FAIL.getMessage());
+            throw new BusinessException(ResultEnum.VERIFY_CODE_FAIL.getCode(), ResultEnum.VERIFY_CODE_FAIL.getMessage());
         }
         //验证码正确
         //验证完成后,redis中数据需要删除
@@ -89,7 +89,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //设置payload
         Map<String, Object> claims = new HashMap<String, Object>();
         claims.put("id", user.getId());
-        claims.put("mobile",user.getMobile());
+        claims.put("mobile", user.getMobile());
 
         // 过期时间设置为12小时
         String token = JwtUtils.createToken(claims, 12 * 60 * 60L);
@@ -103,7 +103,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             this.rocketMQTemplate.convertAndSend("tanhua-sso-login", msg);
         } catch (MessagingException e) {
             log.error("发送消息失败！", e);
-            throw new BusinessException(ResultEnum.ROCKETMQ_SENDMSG_FAIL.getCode(),ResultEnum.ROCKETMQ_SENDMSG_FAIL.getMessage());
+            throw new BusinessException(ResultEnum.ROCKETMQ_SENDMSG_FAIL.getCode(), ResultEnum.ROCKETMQ_SENDMSG_FAIL.getMessage());
         }
 
         Map<String, Object> result = new HashMap<>(2);
@@ -119,21 +119,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         try {
             //1. 解析token
             Claims claims = JwtUtils.decodeToken(token);
-            System.out.println("claims = " + claims);
             //2. 解析token中的id,同时通过id查询数据
             User user = this.userMapper.selectById(claims.get("id").toString());
-            System.out.println(user);
-            if(null != user){
-                return user;
-            }
+            return user;
         } catch (ExpiredJwtException e) {
             System.out.println("token已经过期");
-            throw new BusinessException(ResultEnum.TOKEN_EXPIRED.getCode(),ResultEnum.TOKEN_EXPIRED.getMessage());
+            throw new BusinessException(ResultEnum.TOKEN_EXPIRED.getCode(), ResultEnum.TOKEN_EXPIRED.getMessage());
         } catch (Exception e) {
             System.out.println("token不合法!");
-            throw new BusinessException(ResultEnum.TOKEN_ILLEGAL.getCode(),ResultEnum.TOKEN_ILLEGAL.getMessage());
+            throw new BusinessException(ResultEnum.TOKEN_ILLEGAL.getCode(), ResultEnum.TOKEN_ILLEGAL.getMessage());
         }
-        return null;
     }
 
 }
