@@ -49,8 +49,7 @@ public class UserController {
         Map<String,Object> result = userService.loginVerification(phone, code);
         System.out.println(result);
         if(result.size() == 0){
-            new BusinessException(ResultEnum.CREATE_TOKEN_FAIL.getCode(),ResultEnum.CREATE_TOKEN_FAIL.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            throw  new BusinessException(ResultEnum.CREATE_TOKEN_FAIL.getCode(),ResultEnum.CREATE_TOKEN_FAIL.getMessage());
         }
 
         return ResponseEntity.ok(result);
