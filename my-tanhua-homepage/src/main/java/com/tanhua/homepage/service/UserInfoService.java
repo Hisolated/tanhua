@@ -1,14 +1,13 @@
 package com.tanhua.homepage.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.tanhua.homepage.vo.TodayBest;
+import com.tanhua.common.pojo.UserInfo;
 
 /**
  * @description: some desc
  * @author: isolate
  * @email: 15071340963@163.com
- * @date: 2021/4/12 23:54
+ * @date: 2021/4/13 11:18
  */
-public interface TodayBestService extends IService<TodayBest> {
-    TodayBest queryTodayBest(Long id);
+public interface UserInfoService extends IService<UserInfo> {
 }

@@ -1,8 +1,6 @@
 package com.tanhua.homepage.controller;
 
-import com.tanhua.common.pojo.User;
-import com.tanhua.common.utils.UserThreadLocal;
-import com.tanhua.homepage.service.TodayBestService;
+import com.tanhua.homepage.service.RecommendUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,16 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/tanhua")
-public class TodayBestController {
+public class RecommendUserController {
 
     @Autowired
-    private TodayBestService todayBestService;
+    private RecommendUserService recommendUserService;
 
     @GetMapping("/todayBest")
     public ResponseEntity todayBest(){
-        //1.因为我们已经在拦截器中进行了token校验,这里只需要获取用户的user对象
-        User user = UserThreadLocal.get();
-        todayBestService.queryTodayBest(user.getId());
+        recommendUserService.queryTodayBest();
         return null;
     }
 }
